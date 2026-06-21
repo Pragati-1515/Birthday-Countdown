@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Heart, Lock, Unlock, X, Sparkles, BookOpen,
-  Calendar, ChevronRight, RefreshCw, AlertCircle
+  Calendar, ChevronRight, AlertCircle
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -329,50 +329,7 @@ Happy Birthday, my favorite person in the entire world. ❤️`);
       {/* Sparkles Floating */}
       <div className="absolute inset-0 pointer-events-none z-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent opacity-70" />
 
-      {/* Developer Simulator Panel (Floating bottom-right) */}
-      <div className="fixed bottom-4 right-4 z-50 bg-white/90 backdrop-blur-md p-3 rounded-2xl shadow-xl border border-themePink max-w-xs text-xs font-sans">
-        <div className="flex items-center justify-between mb-2">
-          <span className="font-semibold text-themeText flex items-center gap-1">
-            <RefreshCw className="w-3 h-3 text-themeRose animate-spin" />
-            Dev Testing Controls
-          </span>
-          <span className="text-[10px] bg-themeLavender/50 px-1.5 py-0.5 rounded text-purple-700">June 22 → July 22</span>
-        </div>
-
-        <p className="text-[10px] text-gray-500 mb-2">
-          Use these buttons to mock any day instantly to preview how locked/unlocked cards react:
-        </p>
-
-        <div className="grid grid-cols-5 gap-1 mb-2">
-          <button
-            onClick={() => { setSimulatedDay(null); setBirthdayOpen(false); setBirthdayTriggered(false); }}
-            className={`col-span-2 px-1 py-0.5 rounded border text-center transition ${simulatedDay === null ? 'bg-themeRose text-white border-themeRose' : 'bg-gray-100 hover:bg-gray-200 border-gray-300'}`}
-          >
-            Real Time
-          </button>
-          <button
-            onClick={() => { setSimulatedDay(1); setBirthdayOpen(false); setBirthdayTriggered(false); }}
-            className={`px-1 py-0.5 rounded border text-center transition ${simulatedDay === 1 ? 'bg-themeRose text-white border-themeRose' : 'bg-gray-100 hover:bg-gray-200 border-gray-300'}`}
-          >
-            Day 1
-          </button>
-          <button
-            onClick={() => { setSimulatedDay(5); setBirthdayOpen(false); setBirthdayTriggered(false); }}
-            className={`px-1 py-0.5 rounded border text-center transition ${simulatedDay === 5 ? 'bg-themeRose text-white border-themeRose' : 'bg-gray-100 hover:bg-gray-200 border-gray-300'}`}
-          >
-            Day 5
-          </button>
-          <button
-            onClick={() => { setSimulatedDay(31); triggerBirthdaySequence(); }}
-            className={`px-1 py-0.5 rounded border text-center transition ${simulatedDay === 31 ? 'bg-purple-600 text-white border-purple-600 font-bold' : 'bg-purple-100 hover:bg-purple-200 border-purple-300'}`}
-          >
-            July 22
-          </button>
-        </div>
-        <div className="text-[10px] text-gray-700 font-medium">
-          Simulated Date: <span className="text-themeRose font-bold">{getCurrentDate().toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
-        </div>
-      </div>
+      {/* Developer Simulator Panel Removed for Production */}
 
 
 
