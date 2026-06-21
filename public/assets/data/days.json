@@ -1,0 +1,250 @@
+[
+  {
+    "id": 1,
+    "date": "2026-06-22",
+    "title": "The Beginning",
+    "image": "day-01.jpg",
+    "caption": "core memory.",
+    "messageFile": "day-01.txt"
+  },
+  {
+    "id": 2,
+    "date": "2026-06-23",
+    "title": "Our First Laugh",
+    "image": "day-02.jpg",
+    "caption": "proof of your chaos.",
+    "messageFile": "day-02.txt"
+  },
+  {
+    "id": 3,
+    "date": "2026-06-24",
+    "title": "A Soft Moment",
+    "image": "day-03.jpg",
+    "caption": "still laughing about this.",
+    "messageFile": "day-03.txt"
+  },
+  {
+    "id": 4,
+    "date": "2026-06-25",
+    "title": "Under the Stars",
+    "image": "day-04.jpg",
+    "caption": "one of my favorites.",
+    "messageFile": "day-04.txt"
+  },
+  {
+    "id": 5,
+    "date": "2026-06-26",
+    "title": "Your Sweet Smile",
+    "image": "day-05.jpg",
+    "caption": "how are you this cute?",
+    "messageFile": "day-05.txt"
+  },
+  {
+    "id": 6,
+    "date": "2026-06-27",
+    "title": "An Unforgettable Day",
+    "image": "day-06.jpg",
+    "caption": "this deserved its own frame.",
+    "messageFile": "day-06.txt"
+  },
+  {
+    "id": 7,
+    "date": "2026-06-28",
+    "title": "A Walk to Remember",
+    "image": "placeholder.jpg",
+    "caption": "coming soon...",
+    "messageFile": "day-07.txt"
+  },
+  {
+    "id": 8,
+    "date": "2026-06-29",
+    "title": "Comfort & Coffee",
+    "image": "placeholder.jpg",
+    "caption": "coming soon...",
+    "messageFile": "day-08.txt"
+  },
+  {
+    "id": 9,
+    "date": "2026-06-30",
+    "title": "Late Night Talks",
+    "image": "placeholder.jpg",
+    "caption": "coming soon...",
+    "messageFile": "day-09.txt"
+  },
+  {
+    "id": 10,
+    "date": "2026-07-01",
+    "title": "Halfway to Your Day",
+    "image": "placeholder.jpg",
+    "caption": "coming soon...",
+    "messageFile": "day-10.txt"
+  },
+  {
+    "id": 11,
+    "date": "2026-07-02",
+    "title": "A Beautiful Mess",
+    "image": "placeholder.jpg",
+    "caption": "coming soon...",
+    "messageFile": "day-11.txt"
+  },
+  {
+    "id": 12,
+    "date": "2026-07-03",
+    "title": "Sunshine in My Eyes",
+    "image": "placeholder.jpg",
+    "caption": "coming soon...",
+    "messageFile": "day-12.txt"
+  },
+  {
+    "id": 13,
+    "date": "2026-07-04",
+    "title": "Holding Hands",
+    "image": "placeholder.jpg",
+    "caption": "coming soon...",
+    "messageFile": "day-13.txt"
+  },
+  {
+    "id": 14,
+    "date": "2026-07-05",
+    "title": "Sharing Dreams",
+    "image": "placeholder.jpg",
+    "caption": "coming soon...",
+    "messageFile": "day-14.txt"
+  },
+  {
+    "id": 15,
+    "date": "2026-07-06",
+    "title": "Cozy Rainy Afternoon",
+    "image": "placeholder.jpg",
+    "caption": "coming soon...",
+    "messageFile": "day-15.txt"
+  },
+  {
+    "id": 16,
+    "date": "2026-07-07",
+    "title": "Little Acts of Love",
+    "image": "placeholder.jpg",
+    "caption": "coming soon...",
+    "messageFile": "day-16.txt"
+  },
+  {
+    "id": 17,
+    "date": "2026-07-08",
+    "title": "Just You and Me",
+    "image": "placeholder.jpg",
+    "caption": "coming soon...",
+    "messageFile": "day-17.txt"
+  },
+  {
+    "id": 18,
+    "date": "2026-07-09",
+    "title": "Sweet Melodies",
+    "image": "placeholder.jpg",
+    "caption": "coming soon...",
+    "messageFile": "day-18.txt"
+  },
+  {
+    "id": 19,
+    "date": "2026-07-10",
+    "title": "Warmest Hugs",
+    "image": "placeholder.jpg",
+    "caption": "coming soon...",
+    "messageFile": "day-19.txt"
+  },
+  {
+    "id": 20,
+    "date": "2026-07-11",
+    "title": "A Secret Promise",
+    "image": "placeholder.jpg",
+    "caption": "coming soon...",
+    "messageFile": "day-20.txt"
+  },
+  {
+    "id": 21,
+    "date": "2026-07-12",
+    "title": "Golden Hour",
+    "image": "placeholder.jpg",
+    "caption": "coming soon...",
+    "messageFile": "day-21.txt"
+  },
+  {
+    "id": 22,
+    "date": "2026-07-13",
+    "title": "Your Kind Heart",
+    "image": "placeholder.jpg",
+    "caption": "coming soon...",
+    "messageFile": "day-22.txt"
+  },
+  {
+    "id": 23,
+    "date": "2026-07-14",
+    "title": "Stupid Jokes",
+    "image": "placeholder.jpg",
+    "caption": "coming soon...",
+    "messageFile": "day-23.txt"
+  },
+  {
+    "id": 24,
+    "date": "2026-07-15",
+    "title": "A Shared Future",
+    "image": "placeholder.jpg",
+    "caption": "coming soon...",
+    "messageFile": "day-24.txt"
+  },
+  {
+    "id": 25,
+    "date": "2026-07-16",
+    "title": "Unconditional Comfort",
+    "image": "placeholder.jpg",
+    "caption": "coming soon...",
+    "messageFile": "day-25.txt"
+  },
+  {
+    "id": 26,
+    "date": "2026-07-17",
+    "title": "Counting Days",
+    "image": "placeholder.jpg",
+    "caption": "coming soon...",
+    "messageFile": "day-26.txt"
+  },
+  {
+    "id": 27,
+    "date": "2026-07-18",
+    "title": "Sweet Whispers",
+    "image": "placeholder.jpg",
+    "caption": "coming soon...",
+    "messageFile": "day-27.txt"
+  },
+  {
+    "id": 28,
+    "date": "2026-07-19",
+    "title": "Almost There",
+    "image": "placeholder.jpg",
+    "caption": "coming soon...",
+    "messageFile": "day-28.txt"
+  },
+  {
+    "id": 29,
+    "date": "2026-07-20",
+    "title": "One Last Sleep",
+    "image": "placeholder.jpg",
+    "caption": "coming soon...",
+    "messageFile": "day-29.txt"
+  },
+  {
+    "id": 30,
+    "date": "2026-07-21",
+    "title": "The Eve of Your Day",
+    "image": "placeholder.jpg",
+    "caption": "coming soon...",
+    "messageFile": "day-30.txt"
+  },
+  {
+    "id": 31,
+    "date": "2026-07-22",
+    "title": "Happy Birthday, My Love!",
+    "image": "birthday.jpg",
+    "caption": "the absolute favorite.",
+    "messageFile": "day-31.txt"
+  }
+]

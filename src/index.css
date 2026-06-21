@@ -1,0 +1,139 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #FFF5F7;
+}
+::-webkit-scrollbar-thumb {
+  background: #FF9EB5;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #F8C8DC;
+}
+
+/* Paper Texture Effect */
+.paper-texture {
+  background-color: #ffffff;
+  background-image: 
+    radial-gradient(rgba(74, 58, 74, 0.05) 1px, transparent 0),
+    radial-gradient(rgba(74, 58, 74, 0.05) 1px, transparent 0);
+  background-size: 20px 20px;
+  background-position: 0 0, 10px 10px;
+}
+
+.lined-paper {
+  background-color: #fff9f9;
+  background-image: linear-gradient(#e8d3d3 1px, transparent 1px);
+  background-size: 100% 28px;
+  line-height: 28px;
+}
+
+/* Scrapbook Tape Effect */
+.washi-tape {
+  background: rgba(248, 200, 220, 0.6);
+  backdrop-filter: blur(1px);
+  box-shadow: 0px 2px 4px rgba(0,0,0,0.05);
+  border-left: 2px dashed rgba(255,255,255,0.5);
+  border-right: 2px dashed rgba(255,255,255,0.5);
+  transform: rotate(-3deg);
+}
+
+.washi-tape-lavender {
+  background: rgba(220, 198, 255, 0.6);
+  backdrop-filter: blur(1px);
+  box-shadow: 0px 2px 4px rgba(0,0,0,0.05);
+  border-left: 2px dashed rgba(255,255,255,0.5);
+  border-right: 2px dashed rgba(255,255,255,0.5);
+  transform: rotate(4deg);
+}
+
+/* Sticky note styling */
+.sticky-note {
+  box-shadow: 2px 5px 15px rgba(74, 58, 74, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.sticky-note:hover {
+  transform: scale(1.05) rotate(0deg) !important;
+  box-shadow: 5px 10px 20px rgba(74, 58, 74, 0.15);
+}
+
+/* Polaroid layout shadow */
+.polaroid-card {
+  box-shadow: 0 10px 25px -5px rgba(74, 58, 74, 0.08), 0 8px 10px -6px rgba(74, 58, 74, 0.08);
+}
+
+/* Custom glow effects */
+.glow-subtle {
+  filter: drop-shadow(0 0 8px rgba(255, 158, 181, 0.4));
+}
+.glow-lavender {
+  filter: drop-shadow(0 0 8px rgba(220, 198, 255, 0.4));
+}
+
+/* Custom typing cursor */
+.typing-cursor::after {
+  content: '|';
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  from, to { color: transparent }
+  50% { color: #4A3A4A }
+}
+
+/* Rain Animations for Pink Petals and Hearts */
+@keyframes fall {
+  0% {
+    transform: translate3d(0, -15vh, 0) rotate(0deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.45;
+  }
+  85% {
+    opacity: 0.45;
+  }
+  100% {
+    transform: translate3d(100px, 120vh, 0) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes heartFall {
+  0% {
+    transform: translate3d(0, -15vh, 0) rotate(0deg) scale(0.8);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.35;
+  }
+  85% {
+    opacity: 0.35;
+  }
+  100% {
+    transform: translate3d(-80px, 120vh, 0) rotate(-180deg) scale(1.1);
+    opacity: 0;
+  }
+}
+
+.animate-petal-fall {
+  animation-name: fall !important;
+  animation-timing-function: linear !important;
+  animation-iteration-count: infinite !important;
+  animation-fill-mode: backwards !important;
+  will-change: transform, opacity;
+}
+
+.animate-heart-fall {
+  animation-name: heartFall !important;
+  animation-timing-function: linear !important;
+  animation-iteration-count: infinite !important;
+  animation-fill-mode: backwards !important;
+  will-change: transform, opacity;
+}
