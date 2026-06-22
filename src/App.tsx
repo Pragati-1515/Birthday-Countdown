@@ -66,7 +66,7 @@ export default function App() {
   const [birthdayLetter, setBirthdayLetter] = useState<string>('');
 
   // Date Logic state (can be overridden by developer panel)
-  const [simulatedDay, setSimulatedDay] = useState<number | null>(null);
+  const [simulatedDay] = useState<number | null>(null);
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
 
   // Modals & UI States
@@ -148,12 +148,7 @@ Happy Birthday, my favorite person in the entire world. ❤️`);
     return currentTime;
   };
 
-  const getDayNumber = (targetDateStr: string): number => {
-    const target = new Date(targetDateStr + "T00:00:00");
-    const diffTime = target.getTime() - START_DATE.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays + 1;
-  };
+
 
   // Determine if a specific day is unlocked
   const isDayUnlocked = (day: DayData): boolean => {
@@ -651,7 +646,7 @@ Happy Birthday, my favorite person in the entire world. ❤️`);
               </div>
             ) : (
               <div className="relative border-l-2 border-themePink/30 ml-4 md:ml-32 pl-6 md:pl-12 space-y-12">
-                {days.map((day, index) => {
+                {days.map((day) => {
                   const unlocked = isDayUnlocked(day);
                   const isToday = simulatedDay !== null
                     ? simulatedDay === day.id
