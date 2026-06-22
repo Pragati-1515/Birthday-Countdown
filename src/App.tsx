@@ -528,15 +528,7 @@ Happy Birthday, my favorite person in the entire world. ❤️`);
         <>
           {/* Hero Section */}
           <header className="max-w-6xl mx-auto px-6 pt-16 pb-8 text-center relative z-10">
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/70 border border-themePink/40 text-themeRose font-medium text-sm mb-6 shadow-sm"
-            >
-              <Sparkles className="w-4 h-4 text-themeRose animate-pulse" />
-              <span>Our Romantic Scrapbook Diary</span>
-            </motion.div>
+
 
             <motion.h1
               initial={{ opacity: 0, y: 10 }}
