@@ -3,9 +3,9 @@
     "id": 1,
     "date": "2026-06-22",
     "title": "The Beginning",
-    "image": "day-01.jpg",
+    "image": "day1.jpeg",
     "caption": "core memory.",
-    "messageFile": "day-01.txt"
+    "messageFile": "day1.txt"
   },
   {
     "id": 2,
