@@ -95,7 +95,7 @@ export default function App() {
   // --- Fetch Content Data ---
   useEffect(() => {
     // Fetch days.json
-    fetch('/assets/data/days.json')
+    fetch(`${import.meta.env.BASE_URL}assets/data/days.json`)
       .then(res => res.json())
       .then(data => setDays(data))
       .catch(err => {
@@ -103,7 +103,7 @@ export default function App() {
       });
 
     // Fetch birthday letter
-    fetch('/assets/texts/birthday-letter.txt')
+    fetch(`${import.meta.env.BASE_URL}assets/texts/birthday-letter.txt`)
       .then(res => {
         if (!res.ok) throw new Error();
         return res.text();
@@ -192,7 +192,7 @@ Happy Birthday, my favorite person in the entire world. ❤️`);
     setActiveDay(day);
     setLoadingMessage(true);
     try {
-      const res = await fetch(`/assets/texts/${day.messageFile}`);
+      const res = await fetch(`${import.meta.env.BASE_URL}assets/texts/${day.messageFile}`);
       if (res.ok) {
         const text = await res.text();
         // Check if Vite SPA returned index.html fallback (starts with <)
@@ -479,7 +479,7 @@ Happy Birthday, my favorite person in the entire world. ❤️`);
 
                           <div className="aspect-square bg-gray-50 border border-gray-200/50 rounded-sm overflow-hidden flex items-center justify-center relative shadow-inner">
                             <ImageWithFallback 
-                              src={`/assets/images/${day.image}`}
+                              src={`${import.meta.env.BASE_URL}assets/images/${day.image}`}
                               alt={day.title}
                               className="w-full h-full object-cover"
                             />
@@ -702,7 +702,7 @@ Happy Birthday, my favorite person in the entire world. ❤️`);
                             {/* Mini image preview / camera fallback */}
                             <div className="w-20 h-20 rounded-2xl overflow-hidden bg-themePink/20 flex-shrink-0 flex items-center justify-center border border-themePink/30 relative">
                               <ImageWithFallback
-                                src={`/assets/images/${day.image}`}
+                                src={`${import.meta.env.BASE_URL}assets/images/${day.image}`}
                                 alt={day.title}
                                 className="w-full h-full object-cover"
                               />
@@ -815,7 +815,7 @@ Happy Birthday, my favorite person in the entire world. ❤️`);
                 <div className="bg-white p-4 pb-10 rounded-sm polaroid-card border border-gray-100 shadow-lg relative rotate-[-2deg] max-w-sm mx-auto">
                   <div className="aspect-square bg-gray-50 border border-gray-200/50 rounded-sm overflow-hidden flex items-center justify-center relative">
                     <ImageWithFallback
-                      src={`/assets/images/${activeDay.image}`}
+                      src={`${import.meta.env.BASE_URL}assets/images/${activeDay.image}`}
                       alt={activeDay.title}
                       className="w-full h-full object-cover"
                     />
