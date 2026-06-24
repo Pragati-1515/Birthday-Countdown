@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Heart, Lock, Unlock, X, Sparkles, BookOpen,
-  Calendar, ChevronRight, AlertCircle
+  Calendar, ChevronRight, AlertCircle, Gift
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -81,6 +81,19 @@ export default function App() {
   const [birthdayOpen, setBirthdayOpen] = useState<boolean>(false); // unlocks Grand Finale view
   const [birthdayTab, setBirthdayTab] = useState<'letter' | 'wall'>('letter');
 
+  // Track which days the user has manually opened (persisted in localStorage)
+  const [openedDays, setOpenedDays] = useState<Set<number>>(() => {
+    const stored = localStorage.getItem('birthday-countdown-opened-days');
+    if (stored) {
+      try {
+        return new Set(JSON.parse(stored));
+      } catch {
+        return new Set();
+      }
+    }
+    return new Set();
+  });
+
   const getDaysRemainingText = () => {
     const totalSeconds = getBirthdayCountdownSeconds();
     const daysLeft = Math.ceil(totalSeconds / (3600 * 24));
@@ -132,6 +145,11 @@ Happy Birthday, my favorite person in the entire world. ❤️`);
     return () => clearInterval(timer);
   }, []);
 
+  // Persist opened days to localStorage
+  useEffect(() => {
+    localStorage.setItem('birthday-countdown-opened-days', JSON.stringify([...openedDays]));
+  }, [openedDays]);
+
   // --- Date Calculation Logic ---
   const getCurrentDate = (): Date => {
     if (simulatedDay !== null) {
@@ -150,11 +168,23 @@ Happy Birthday, my favorite person in the entire world. ❤️`);
 
 
 
-  // Determine if a specific day is unlocked
+  // Determine if a specific day is unlocked (time has passed)
   const isDayUnlocked = (day: DayData): boolean => {
     const now = getCurrentDate();
     const unlockDate = new Date(day.date + "T00:00:00");
     return now >= unlockDate;
+  };
+
+  // Check if a day's content has been revealed (manually opened or auto-revealed)
+  const isDayRevealed = (day: DayData): boolean => {
+    // If user manually opened it
+    if (openedDays.has(day.id)) return true;
+
+    // Auto-reveal: if the NEXT day is already time-unlocked
+    // (user missed opening this day's gift, so it auto-reveals)
+    const nextDayDate = new Date(new Date(day.date + "T00:00:00").getTime() + 24 * 60 * 60 * 1000);
+    const now = getCurrentDate();
+    return now >= nextDayDate;
   };
 
   // Determine if Birthday Finale is unlocked
@@ -212,6 +242,28 @@ Happy Birthday, my favorite person in the entire world. ❤️`);
     }
   };
 
+  // Handle opening a gift (user taps to reveal a locked day)
+  const handleOpenGift = (day: DayData) => {
+    if (!isDayUnlocked(day)) return;
+
+    // Mark as opened in localStorage
+    setOpenedDays(prev => {
+      const next = new Set(prev);
+      next.add(day.id);
+      return next;
+    });
+
+    // Fire confetti celebration
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+
+    // Open the memory modal
+    handleOpenDay(day);
+  };
+
 
 
   // --- Scroll to top when Birthday view is active ---
@@ -221,80 +273,102 @@ Happy Birthday, my favorite person in the entire world. ❤️`);
     }
   }, [birthdayOpen]);
 
-  // --- Birthday Midnight Sequence Trigger ---
-  useEffect(() => {
-    if (isBirthdayUnlocked() && !birthdayOpen && !birthdayTriggered) {
-      triggerBirthdaySequence();
-    }
-  }, [simulatedDay, currentTime]);
+  // --- Birthday auto-trigger REMOVED: user must tap to open ---
 
   const triggerBirthdaySequence = () => {
     setBirthdayTriggered(true);
     setBirthdayStep(1);
 
-    // Step 2: "Happy Birthday" (2s)
+    // Immediate confetti burst (party bomber!)
+    setTimeout(() => {
+      confetti({ particleCount: 150, spread: 100, origin: { y: 0.5 } });
+    }, 800);
+
+    // More confetti from sides
+    setTimeout(() => {
+      confetti({ particleCount: 80, angle: 60, spread: 55, origin: { x: 0, y: 0.5 } });
+      confetti({ particleCount: 80, angle: 120, spread: 55, origin: { x: 1, y: 0.5 } });
+    }, 2000);
+
+    // Another burst
+    setTimeout(() => {
+      confetti({ particleCount: 100, spread: 80, origin: { y: 0.4 } });
+    }, 4000);
+
+    // Step 2: Quote 1 - "This journey was never about counting days."
     setTimeout(() => {
       setBirthdayStep(2);
-      // Trigger confetti!
-      confetti({
-        particleCount: 150,
-        spread: 80,
-        origin: { y: 0.6 }
-      });
-    }, 3000);
-
-    // Step 3: Message 1 (2.5s)
-    setTimeout(() => {
-      setBirthdayStep(3);
+      confetti({ particleCount: 60, spread: 70, origin: { y: 0.5 } });
     }, 6000);
 
-    // Step 4: Message 2 (2.5s)
+    // Step 3: Quote 2 - "...It was about celebrating you."
+    setTimeout(() => {
+      setBirthdayStep(3);
+      confetti({ particleCount: 80, angle: 60, spread: 55, origin: { x: 0, y: 0.5 } });
+      confetti({ particleCount: 80, angle: 120, spread: 55, origin: { x: 1, y: 0.5 } });
+    }, 9500);
+
+    // Final big burst + transition to letter
+    setTimeout(() => {
+      confetti({ particleCount: 200, spread: 120, origin: { y: 0.6 } });
+      confetti({ particleCount: 80, angle: 60, spread: 55, origin: { x: 0, y: 0.6 } });
+      confetti({ particleCount: 80, angle: 120, spread: 55, origin: { x: 1, y: 0.6 } });
+    }, 12000);
+
+    // Fade to letter view
     setTimeout(() => {
       setBirthdayStep(4);
-    }, 9000);
-
-    // Step 5: Unlock Finale Board
-    setTimeout(() => {
-      setBirthdayStep(5);
       setBirthdayOpen(true);
-      // Continuous showers of confetti
-      const interval = setInterval(() => {
-        confetti({
-          particleCount: 50,
-          angle: 60,
-          spread: 55,
-          origin: { x: 0 }
-        });
-        confetti({
-          particleCount: 50,
-          angle: 120,
-          spread: 55,
-          origin: { x: 1 }
-        });
-      }, 2000);
-      setTimeout(() => clearInterval(interval), 10000);
-    }, 12000);
+    }, 13000);
   };
 
-  // --- Decorative Falling Petals & Floating Hearts ---
-  const petals = Array.from({ length: 35 });
-  const hearts = Array.from({ length: 25 });
+  // --- Decorative Falling Petals & Floating Hearts (memoized for performance) ---
+  const hearts = useMemo(() => Array.from({ length: 25 }, () => ({
+    left: Math.random() * 100,
+    fontSize: 12 + Math.random() * 20,
+    delay: Math.random() * 4,
+    duration: 4 + Math.random() * 5,
+  })), []);
+
+  const petals = useMemo(() => Array.from({ length: 35 }, () => ({
+    left: Math.random() * 100,
+    fontSize: 14 + Math.random() * 18,
+    delay: Math.random() * 5,
+    duration: 5 + Math.random() * 6,
+  })), []);
+
+  // Birthday overlay particles (memoized)
+  const bdayHearts = useMemo(() => Array.from({ length: 50 }, () => ({
+    left: Math.random() * 100,
+    fontSize: 14 + Math.random() * 24,
+    delay: Math.random() * 8,
+    duration: 6 + Math.random() * 8,
+    opacity: 0.4 + Math.random() * 0.3,
+  })), []);
+
+  const bdayPetals = useMemo(() => Array.from({ length: 50 }, () => ({
+    left: Math.random() * 100,
+    fontSize: 16 + Math.random() * 22,
+    delay: Math.random() * 10,
+    duration: 8 + Math.random() * 8,
+    opacity: 0.5 + Math.random() * 0.3,
+  })), []);
 
   return (
-    <div className="relative min-h-screen bg-themeBg text-themeText font-sans overflow-hidden">
+    <div className={`relative min-h-screen ${isBirthdayUnlocked() ? 'bg-pink-50' : 'bg-themeBg'} text-themeText font-sans overflow-hidden`}>
 
       {/* Falling Hearts Rain */}
       <div className="fixed inset-0 pointer-events-none z-10 overflow-hidden">
-        {hearts.map((_, i) => (
+        {hearts.map((h, i) => (
           <div
             key={`heart-${i}`}
             className="absolute text-themeRose/30 animate-heart-fall"
             style={{
-              left: `${Math.random() * 100}%`,
+              left: `${h.left}%`,
               top: `-10vh`,
-              fontSize: `${12 + Math.random() * 20}px`,
-              animationDelay: `${Math.random() * 15}s`,
-              animationDuration: `${8 + Math.random() * 10}s`,
+              fontSize: `${h.fontSize}px`,
+              animationDelay: `${h.delay}s`,
+              animationDuration: `${h.duration}s`,
             }}
           >
             ❤️
@@ -304,16 +378,16 @@ Happy Birthday, my favorite person in the entire world. ❤️`);
 
       {/* Falling Petals Rain */}
       <div className="fixed inset-0 pointer-events-none z-10 overflow-hidden">
-        {petals.map((_, i) => (
+        {petals.map((p, i) => (
           <div
             key={`petal-${i}`}
             className="absolute text-[#FFC0CB]/50 animate-petal-fall"
             style={{
-              left: `${Math.random() * 100}%`,
+              left: `${p.left}%`,
               top: `-10vh`,
-              fontSize: `${14 + Math.random() * 18}px`,
-              animationDelay: `${Math.random() * 20}s`,
-              animationDuration: `${12 + Math.random() * 10}s`,
+              fontSize: `${p.fontSize}px`,
+              animationDelay: `${p.delay}s`,
+              animationDuration: `${p.duration}s`,
             }}
           >
             🌸
@@ -328,200 +402,349 @@ Happy Birthday, my favorite person in the entire world. ❤️`);
 
 
 
-      {/* CINEMATIC MIDNIGHT SEQUENCE COVER */}
+      {/* BIRTHDAY LANDING PAGE - Tap to Open */}
+      {isBirthdayUnlocked() && !birthdayTriggered && !birthdayOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1 }}
+          className="fixed inset-0 bg-pink-50 z-40 flex flex-col items-center justify-center px-6 text-center overflow-hidden"
+        >
+          {/* Soft background hearts */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            {bdayHearts.slice(0, 20).map((h, i) => (
+              <div
+                key={`landing-heart-${i}`}
+                className="absolute animate-heart-fall"
+                style={{
+                  left: `${h.left}%`,
+                  top: `-10vh`,
+                  fontSize: `${h.fontSize}px`,
+                  animationDelay: `${h.delay}s`,
+                  animationDuration: `${h.duration}s`,
+                  opacity: 0.2,
+                }}
+              >
+                ❤️
+              </div>
+            ))}
+          </div>
+
+          {/* Soft glowing circles */}
+          <div className="absolute top-1/3 left-1/4 w-64 h-64 bg-pink-200/30 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-pink-300/20 rounded-full blur-3xl" />
+
+          {/* Content */}
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
+            className="relative z-10 space-y-8"
+          >
+            <motion.div
+              animate={{ scale: [1, 1.1, 1], rotate: [0, -3, 3, 0] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              className="text-8xl md:text-9xl drop-shadow-lg"
+            >
+              🎁
+            </motion.div>
+
+            <div className="space-y-3">
+              <h1 className="text-3xl md:text-5xl font-handwritten font-bold text-themeRose drop-shadow-sm">
+                Your Special Day Has Arrived!
+              </h1>
+              <p className="text-lg md:text-xl font-light text-themeText/60 max-w-md mx-auto">
+                Something beautiful is waiting for you inside...
+              </p>
+            </div>
+
+            <motion.button
+              onClick={triggerBirthdaySequence}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-10 py-4 rounded-full bg-gradient-to-r from-themeRose to-pink-400 text-white font-bold text-lg shadow-xl hover:shadow-2xl transition duration-300 flex items-center gap-3 mx-auto border border-white/20"
+            >
+              <Sparkles className="w-5 h-5" />
+              Open Your Birthday Surprise
+              <Heart className="w-5 h-5 fill-white" />
+            </motion.button>
+
+            <motion.p
+              animate={{ opacity: [0.4, 1, 0.4] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              className="text-sm text-themeRose/60 font-light"
+            >
+              ✨ Tap to unwrap ✨
+            </motion.p>
+          </motion.div>
+        </motion.div>
+      )}
+
+      {/* BIRTHDAY FULLSCREEN HAPPY BIRTHDAY OVERLAY */}
       <AnimatePresence>
-        {birthdayTriggered && birthdayStep < 5 && (
+        {birthdayTriggered && !birthdayOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-[#1e131d] z-50 flex flex-col items-center justify-center text-white px-6 text-center"
+            transition={{ duration: 1.5 }}
+            className="fixed inset-0 bg-pink-50 z-50 flex flex-col items-center justify-center px-6 text-center overflow-hidden"
           >
+            {/* Raining Hearts */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
-              {Array.from({ length: 40 }).map((_, i) => (
+              {bdayHearts.map((h, i) => (
                 <div
-                  key={`confetti-${i}`}
-                  className="absolute text-pink-300 animate-float-slow"
+                  key={`bday-heart-${i}`}
+                  className="absolute animate-heart-fall"
                   style={{
-                    left: `${Math.random() * 100}%`,
-                    bottom: `-${10 + Math.random() * 20}%`,
-                    fontSize: `${10 + Math.random() * 20}px`,
-                    animationDelay: `${Math.random() * 5}s`,
-                    animationDuration: `${8 + Math.random() * 6}s`,
+                    left: `${h.left}%`,
+                    top: `-10vh`,
+                    fontSize: `${h.fontSize}px`,
+                    animationDelay: `${h.delay}s`,
+                    animationDuration: `${h.duration}s`,
+                    opacity: h.opacity,
                   }}
                 >
-                  ❤️
+                  💕
                 </div>
               ))}
             </div>
 
-            <AnimatePresence mode="wait">
-              {birthdayStep === 2 && (
-                <motion.div
-                  key="step2"
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 1.1, opacity: 0 }}
-                  transition={{ duration: 1 }}
-                  className="space-y-4"
+            {/* Raining Petals */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+              {bdayPetals.map((p, i) => (
+                <div
+                  key={`bday-petal-${i}`}
+                  className="absolute animate-petal-fall"
+                  style={{
+                    left: `${p.left}%`,
+                    top: `-10vh`,
+                    fontSize: `${p.fontSize}px`,
+                    animationDelay: `${p.delay}s`,
+                    animationDuration: `${p.duration}s`,
+                    opacity: p.opacity,
+                  }}
                 >
-                  <Heart className="w-20 h-20 text-themeRose mx-auto animate-beat fill-themeRose filter drop-shadow-[0_0_15px_rgba(255,158,181,0.8)]" />
-                  <h1 className="text-4xl md:text-6xl font-handwritten font-bold text-themePink">
-                    Happy Birthday ❤️
-                  </h1>
-                </motion.div>
-              )}
+                  🌸
+                </div>
+              ))}
+            </div>
 
-              {birthdayStep === 3 && (
-                <motion.p
-                  key="step3"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 1 }}
-                  className="text-2xl md:text-4xl font-light tracking-wide max-w-2xl font-sans text-pink-100"
-                >
-                  "This journey was never about counting days."
-                </motion.p>
-              )}
+            {/* Soft glowing circles */}
+            <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-pink-200/30 rounded-full blur-3xl" />
+            <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-pink-300/20 rounded-full blur-3xl" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-rose-200/20 rounded-full blur-3xl" />
 
-              {birthdayStep === 4 && (
-                <motion.p
-                  key="step4"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 1 }}
-                  className="text-2xl md:text-4xl font-light tracking-wide max-w-2xl font-sans text-pink-100"
-                >
-                  "...It was about celebrating you."
-                </motion.p>
-              )}
-            </AnimatePresence>
+            {/* Happy Birthday Content - Crossfade with absolute positioning */}
+            <div className="relative z-10 w-full flex items-center justify-center" style={{ minHeight: '300px' }}>
+              <AnimatePresence>
+                {birthdayStep === 1 && (
+                  <motion.div
+                    key="step-hbd"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 1.5, ease: [0.4, 0, 0.2, 1] }}
+                    className="absolute inset-0 flex flex-col items-center justify-center space-y-6"
+                  >
+                    <motion.div
+                      initial={{ scale: 0.5 }}
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ duration: 2.5, repeat: Infinity, repeatDelay: 0.5, ease: "easeInOut" }}
+                    >
+                      <Heart className="w-24 h-24 text-themeRose fill-themeRose mx-auto filter drop-shadow-[0_0_25px_rgba(255,158,181,0.8)]" />
+                    </motion.div>
+
+                    <motion.h1
+                      initial={{ y: 30, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ duration: 1.2, delay: 0.8, ease: [0.4, 0, 0.2, 1] }}
+                      className="text-5xl md:text-7xl font-handwritten font-bold text-themeRose drop-shadow-sm"
+                    >
+                      Happy Birthday! 🎂
+                    </motion.h1>
+
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 1.2, delay: 1.8, ease: [0.4, 0, 0.2, 1] }}
+                      className="text-xl md:text-2xl font-light text-themeText/70 max-w-lg mx-auto"
+                    >
+                      Today is all about you, my love ❤️
+                    </motion.p>
+
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 1, delay: 2.8 }}
+                      className="flex justify-center gap-4 text-3xl"
+                    >
+                      {['🎉', '🎊', '🎈', '🎀', '✨'].map((emoji, i) => (
+                        <motion.span
+                          key={i}
+                          animate={{ y: [0, -8, 0] }}
+                          transition={{ duration: 3, repeat: Infinity, delay: i * 0.4, ease: "easeInOut" }}
+                        >
+                          {emoji}
+                        </motion.span>
+                      ))}
+                    </motion.div>
+                  </motion.div>
+                )}
+
+                {birthdayStep === 2 && (
+                  <motion.div
+                    key="step-quote1"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 1.5, ease: [0.4, 0, 0.2, 1] }}
+                    className="absolute inset-0 flex flex-col items-center justify-center space-y-6"
+                  >
+                    <motion.div
+                      animate={{ scale: [1, 1.15, 1] }}
+                      transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                      <Heart className="w-16 h-16 text-themeRose fill-themeRose mx-auto filter drop-shadow-[0_0_20px_rgba(255,158,181,0.6)]" />
+                    </motion.div>
+                    <p className="text-2xl md:text-4xl font-light tracking-wide max-w-2xl font-sans text-themeText/80 italic px-4">
+                      "This journey was never about counting days."
+                    </p>
+                  </motion.div>
+                )}
+
+                {birthdayStep === 3 && (
+                  <motion.div
+                    key="step-quote2"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 1.5, ease: [0.4, 0, 0.2, 1] }}
+                    className="absolute inset-0 flex flex-col items-center justify-center space-y-6"
+                  >
+                    <motion.div
+                      animate={{ scale: [1, 1.15, 1] }}
+                      transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                      <Heart className="w-16 h-16 text-themeRose fill-themeRose mx-auto filter drop-shadow-[0_0_20px_rgba(255,158,181,0.6)]" />
+                    </motion.div>
+                    <p className="text-2xl md:text-4xl font-light tracking-wide max-w-2xl font-sans text-themeText/80 italic px-4">
+                      "...It was about celebrating you."
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
 
       {birthdayOpen ? (
-        // --- BIRTHDAY FINALE EXPERIENCES ---
+        // --- BIRTHDAY LETTER VIEW (Pink Background) ---
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="max-w-5xl mx-auto px-6 py-12 relative z-10 space-y-10"
+          transition={{ duration: 1.5 }}
+          className="max-w-7xl mx-auto px-6 py-12 relative z-10"
         >
           {/* Birthday Header */}
-          <header className="text-center pt-8">
-            <Heart className="w-16 h-16 text-themeRose fill-themeRose mx-auto mb-4 animate-pulse animate-beat" />
-            <h1 className="text-4xl md:text-5xl font-bold font-sans bg-gradient-to-r from-themeRose via-purple-500 to-themeRose bg-clip-text text-transparent drop-shadow-sm">
-              Happy Birthday, My Angel! ❤️
+          <header className="text-center pt-8 mb-10">
+            <motion.div
+              animate={{ scale: [1, 1.15, 1] }}
+              transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
+            >
+              <Heart className="w-16 h-16 text-themeRose fill-themeRose mx-auto mb-4 filter drop-shadow-[0_0_15px_rgba(255,158,181,0.6)]" />
+            </motion.div>
+            <h1 className="text-4xl md:text-5xl font-bold font-handwritten text-themeRose drop-shadow-sm">
+              Happy Birthday! ❤️
             </h1>
-            <p className="text-sm text-themeText/70 mt-2 font-light">
-              Our journey is complete. Open the tabs below to read your letter and browse our scrapbook memories.
+            <p className="text-sm text-themeText/60 mt-3 font-light">
+              A letter written from the heart, just for you.
             </p>
           </header>
 
-          {/* Top Navigation Bar */}
-          <div className="flex justify-center border-b border-themePink/20 pb-4">
-            <div className="flex bg-white/80 backdrop-blur-md p-1.5 rounded-full border border-themePink/30 gap-1.5 shadow-sm">
-              <button
-                onClick={() => setBirthdayTab('wall')}
-                className={`px-5 py-2.5 rounded-full font-medium text-xs flex items-center gap-1.5 transition-all duration-300 ${
-                  birthdayTab === 'wall' 
-                    ? 'bg-themeRose text-white shadow-md scale-105' 
-                    : 'text-themeText/75 hover:bg-themePink/10 hover:text-themeRose'
-                }`}
-              >
-                <Sparkles className="w-4 h-4" /> Memory Wall
-              </button>
-              <button
-                onClick={() => setBirthdayTab('letter')}
-                className={`px-5 py-2.5 rounded-full font-medium text-xs flex items-center gap-1.5 transition-all duration-300 ${
-                  birthdayTab === 'letter' 
-                    ? 'bg-themeRose text-white shadow-md scale-105' 
-                    : 'text-themeText/75 hover:bg-themePink/10 hover:text-themeRose'
-                }`}
-              >
-                <BookOpen className="w-4 h-4" /> Read a Letter
-              </button>
+          {/* Birthday Letter */}
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="paper-texture lined-paper border border-[#e8d3d3] rounded-3xl p-8 md:p-12 shadow-2xl relative bg-white/80 max-w-3xl mx-auto"
+          >
+            <div className="absolute top-[-10px] left-8 washi-tape px-6 py-1 text-xs text-transparent">TAPE</div>
+            <div className="absolute top-[-5px] right-8 washi-tape-lavender px-6 py-1 text-xs text-transparent">TAPE</div>
+
+            <h2 className="text-3xl font-handwritten font-bold mb-8 text-center text-themeText">🎁 Your Birthday Letter</h2>
+            <div className="whitespace-pre-wrap font-handwritten text-xl md:text-2xl text-themeText leading-relaxed max-w-2xl mx-auto">
+              {birthdayLetter}
             </div>
-          </div>
+            <div className="mt-8 text-center">
+              <Heart className="w-8 h-8 text-themeRose fill-themeRose mx-auto animate-pulse" />
+            </div>
+          </motion.section>
 
-          {/* Active Tab Content */}
-          <div className="py-6">
-            <AnimatePresence mode="wait">
-              {birthdayTab === 'wall' && (
-                <motion.section 
-                  key="wall"
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -15 }}
-                  transition={{ duration: 0.4 }}
-                  className="space-y-6"
-                >
-                  <div className="text-center mb-8">
-                    <h2 className="text-2xl font-bold font-sans text-themeText">📌 Polaroid Memory Wall</h2>
-                    <p className="text-xs text-themeText/70 mt-1">Tap a card to straighten and open its detail log.</p>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 justify-center max-w-6xl mx-auto px-4">
-                    {days.map((day, idx) => {
-                      const rotValues = ["-4deg", "3deg", "-2deg", "5deg", "-5deg", "2deg"];
-                      const rotation = rotValues[idx % rotValues.length];
+          {/* View Memory Wall Button */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1 }}
+            className="text-center mt-10"
+          >
+            <button
+              onClick={() => setBirthdayTab(birthdayTab === 'letter' ? 'wall' : 'letter')}
+              className="px-8 py-3 rounded-full bg-white/80 border border-themePink/30 text-themeRose font-semibold text-sm shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition duration-300 flex items-center gap-2 mx-auto"
+            >
+              <Sparkles className="w-4 h-4" />
+              {birthdayTab === 'letter' ? 'View Memory Wall' : 'Back to Letter'}
+            </button>
+          </motion.div>
 
-                      return (
-                        <motion.div
-                          key={`polaroid-${day.id}`}
-                          whileHover={{ scale: 1.05, rotate: "0deg", zIndex: 10 }}
-                          style={{ rotate: rotation }}
-                          className="bg-white p-4 pb-8 rounded-sm polaroid-card border border-gray-200/60 relative transition-shadow duration-300 hover:shadow-xl shadow-md cursor-pointer max-w-[280px] mx-auto w-full"
-                          onClick={() => handleOpenDay(day)}
-                        >
-                          <div className={`absolute -top-4 left-1/2 -translate-x-1/2 w-24 h-6 z-20 ${idx % 2 === 0 ? 'washi-tape' : 'washi-tape-lavender'}`} />
-
-                          <div className="aspect-square bg-gray-50 border border-gray-200/50 rounded-sm overflow-hidden flex items-center justify-center relative shadow-inner">
-                            <ImageWithFallback 
-                              src={`${import.meta.env.BASE_URL}assets/images/${day.image}`}
-                              alt={day.title}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-
-                          <div className="mt-4 text-center">
-                            <p className="font-handwritten text-lg font-bold text-[#4A3B32] leading-snug px-1 line-clamp-2">
-                              {day.caption}
-                            </p>
-                            <p className="text-xs font-semibold tracking-wider text-themeText/50 uppercase mt-2">Day {day.id}</p>
-                          </div>
-                        </motion.div>
-                      );
-                    })}
-                  </div>
-                </motion.section>
-              )}
-
-              {birthdayTab === 'letter' && (
-                <motion.section 
-                  key="letter"
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -15 }}
-                  transition={{ duration: 0.4 }}
-                  id="birthday-letter" 
-                  className="paper-texture lined-paper border border-[#e8d3d3] rounded-3xl p-8 md:p-12 shadow-2xl relative max-w-3xl mx-auto"
-                >
-                  <div className="absolute top-[-10px] left-8 washi-tape px-6 py-1 text-xs text-transparent">TAPE</div>
-                  <div className="absolute top-[-5px] right-8 washi-tape-lavender px-6 py-1 text-xs text-transparent">TAPE</div>
-                  
-                  <h2 className="text-3xl font-handwritten font-bold mb-8 text-center text-themeText">🎁 Your Birthday Letter</h2>
-                  <div className="whitespace-pre-wrap font-handwritten text-xl md:text-2xl text-themeText leading-relaxed max-w-2xl mx-auto">
-                    {birthdayLetter}
-                  </div>
-                  <div className="mt-8 text-center">
-                    <Heart className="w-8 h-8 text-themeRose fill-themeRose mx-auto animate-pulse" />
-                  </div>
-                </motion.section>
-              )}
-            </AnimatePresence>
-          </div>
+          {/* Memory Wall (toggled) */}
+          <AnimatePresence>
+            {birthdayTab === 'wall' && (
+              <motion.section
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.5 }}
+                className="mt-10 space-y-6"
+              >
+                <div className="text-center mb-8">
+                  <h2 className="text-2xl font-bold font-sans text-themeText">📌 Polaroid Memory Wall</h2>
+                  <p className="text-xs text-themeText/70 mt-1">Tap a card to open its detail.</p>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 justify-center max-w-7xl mx-auto px-4">
+                  {days.map((day, idx) => {
+                    const rotValues = ["-4deg", "3deg", "-2deg", "5deg", "-5deg", "2deg"];
+                    const rotation = rotValues[idx % rotValues.length];
+                    return (
+                      <motion.div
+                        key={`polaroid-${day.id}`}
+                        whileHover={{ scale: 1.04, rotate: "0deg", zIndex: 10 }}
+                        style={{ rotate: rotation }}
+                        className="bg-white p-5 pb-10 rounded-sm polaroid-card border border-gray-200/60 relative transition-shadow duration-300 hover:shadow-xl shadow-md cursor-pointer w-full"
+                        onClick={() => handleOpenDay(day)}
+                      >
+                        <div className={`absolute -top-4 left-1/2 -translate-x-1/2 w-24 h-6 z-20 ${idx % 2 === 0 ? 'washi-tape' : 'washi-tape-lavender'}`} />
+                        <div className="aspect-square bg-gray-50 border border-gray-200/50 rounded-sm overflow-hidden flex items-center justify-center relative shadow-inner">
+                          <ImageWithFallback
+                            src={`${import.meta.env.BASE_URL}assets/images/${day.image}`}
+                            alt={day.title}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="mt-4 text-center">
+                          <p className="font-handwritten text-lg font-bold text-[#4A3B32] leading-snug px-1 line-clamp-2">
+                            {day.caption}
+                          </p>
+                          <p className="text-xs font-semibold tracking-wider text-themeText/50 uppercase mt-2">Day {day.id}</p>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </motion.section>
+            )}
+          </AnimatePresence>
         </motion.div>
       ) : (
         // --- COUNTDOWN / TIMELINE VIEW ---
@@ -640,6 +863,8 @@ Happy Birthday, my favorite person in the entire world. ❤️`);
               <div className="relative border-l-2 border-themePink/30 ml-4 md:ml-32 pl-6 md:pl-12 space-y-12">
                 {days.map((day) => {
                   const unlocked = isDayUnlocked(day);
+                  const revealed = isDayRevealed(day);
+                  const giftAvailable = unlocked && !revealed;
                   const isToday = simulatedDay !== null
                     ? simulatedDay === day.id
                     : new Date().toDateString() === new Date(day.date + "T00:00:00").toDateString();
@@ -650,14 +875,19 @@ Happy Birthday, my favorite person in the entire world. ❤️`);
                     <div key={day.id} className="relative group">
 
                       {/* Timeline Dot Indicator */}
-                      <div className={`absolute left-[-31px] md:left-[-55px] top-1.5 w-5 h-5 rounded-full border-4 flex items-center justify-center transition ${unlocked
+                      <div className={`absolute left-[-31px] md:left-[-55px] top-1.5 w-5 h-5 rounded-full border-4 flex items-center justify-center transition ${
+                        revealed
                           ? isToday
                             ? 'bg-themeRose border-white scale-125 shadow-md ring-4 ring-themePink/30'
                             : 'bg-white border-themeRose'
-                          : 'bg-gray-300 border-gray-400'
+                          : giftAvailable
+                            ? 'bg-themePink border-themeRose scale-110 shadow-md ring-4 ring-themePink/20 animate-pulse'
+                            : 'bg-gray-300 border-gray-400'
                         }`}>
-                        {unlocked ? (
+                        {revealed ? (
                           <div className="w-1.5 h-1.5 rounded-full bg-themeRose" />
+                        ) : giftAvailable ? (
+                          <Gift className="w-2.5 h-2.5 text-themeRose" />
                         ) : (
                           <Lock className="w-2.5 h-2.5 text-gray-500" />
                         )}
@@ -674,11 +904,17 @@ Happy Birthday, my favorite person in the entire world. ❤️`);
                         initial={{ opacity: 0, y: 15 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true, margin: "-100px" }}
-                        onClick={() => unlocked && handleOpenDay(day)}
-                        className={`relative p-5 rounded-3xl transition duration-300 select-none ${unlocked
+                        onClick={() => {
+                          if (revealed) handleOpenDay(day);
+                          else if (giftAvailable) handleOpenGift(day);
+                        }}
+                        className={`relative p-5 rounded-3xl transition duration-300 select-none ${
+                          revealed
                             ? 'bg-white border border-themePink/30 hover:border-themeRose shadow-sm hover:shadow-md cursor-pointer hover:-translate-y-1'
-                            : 'bg-white/40 border border-gray-200/50 backdrop-blur-[2px] filter blur-[0.6px]'
-                          } ${isToday ? 'ring-2 ring-themeRose/60 bg-gradient-to-br from-white to-themePink/5' : ''}`}
+                            : giftAvailable
+                              ? 'bg-gradient-to-br from-themePink/10 via-white to-themeLavender/10 border-2 border-dashed border-themeRose/40 shadow-md cursor-pointer hover:-translate-y-1 hover:shadow-lg'
+                              : 'bg-white/40 border border-gray-200/50 backdrop-blur-[2px] filter blur-[0.6px]'
+                          } ${isToday ? 'ring-2 ring-themeRose/60' : ''}`}
                       >
 
                         {/* Mobile Date Header */}
@@ -689,7 +925,7 @@ Happy Birthday, my favorite person in the entire world. ❤️`);
                           </span>
                         </div>
 
-                        {unlocked ? (
+                        {revealed ? (
                           <div className="flex flex-col sm:flex-row gap-4 items-center">
                             {/* Mini image preview / camera fallback */}
                             <div className="w-20 h-20 rounded-2xl overflow-hidden bg-themePink/20 flex-shrink-0 flex items-center justify-center border border-themePink/30 relative">
@@ -702,7 +938,7 @@ Happy Birthday, my favorite person in the entire world. ❤️`);
                             <div className="flex-1 text-center sm:text-left">
                               <div className="flex items-center justify-center sm:justify-start gap-1.5 text-themeRose font-semibold text-sm">
                                 <Unlock className="w-3.5 h-3.5" />
-                                Unlocks Day {dayNum} {isToday && <span className="bg-themeRose text-white text-[9px] px-1.5 py-0.5 rounded-full ml-1">Active Today</span>}
+                                Unlocked Day {dayNum} {isToday && <span className="bg-themeRose text-white text-[9px] px-1.5 py-0.5 rounded-full ml-1">Active Today</span>}
                               </div>
                               <h4 className="text-lg font-bold text-themeText mt-0.5 leading-snug">{day.title}</h4>
                               <p className="text-xs text-themeText/75 mt-1 font-handwritten text-md italic">"{day.caption}"</p>
@@ -710,6 +946,28 @@ Happy Birthday, my favorite person in the entire world. ❤️`);
                             <div className="text-xs text-themeRose font-semibold border border-themePink/40 bg-themePink/10 px-3 py-1 rounded-full hover:bg-themeRose hover:text-white transition flex items-center gap-1">
                               Open Memory <ChevronRight className="w-3.5 h-3.5" />
                             </div>
+                          </div>
+                        ) : giftAvailable ? (
+                          <div className="py-6 flex flex-col items-center justify-center text-center space-y-3">
+                            <motion.div
+                              animate={{ scale: [1, 1.15, 1], rotate: [0, -5, 5, 0] }}
+                              transition={{ duration: 2, repeat: Infinity, repeatDelay: 1.5 }}
+                              className="text-5xl drop-shadow-lg"
+                            >
+                              🎁
+                            </motion.div>
+                            <div>
+                              <h4 className="text-lg font-bold text-themeText">Day {dayNum} Gift is Ready!</h4>
+                              <p className="text-xs text-themeText/60 mt-1 font-light">Tap to unwrap this memory</p>
+                            </div>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); handleOpenGift(day); }}
+                              className="px-6 py-2.5 rounded-full bg-gradient-to-r from-themeRose to-purple-500 text-white font-semibold text-sm shadow-lg hover:scale-105 active:scale-95 transition duration-300 flex items-center gap-2"
+                            >
+                              <Gift className="w-4 h-4" />
+                              Open Today's Gift
+                              <Sparkles className="w-4 h-4 animate-pulse" />
+                            </button>
                           </div>
                         ) : (
                           <div className="py-4 text-center sm:text-left flex flex-col sm:flex-row items-center gap-4 justify-between">
