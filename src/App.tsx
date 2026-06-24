@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Heart, Lock, Unlock, X, Sparkles, BookOpen,
+  Heart, Lock, Unlock, X, Sparkles,
   Calendar, ChevronRight, AlertCircle, Gift
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
